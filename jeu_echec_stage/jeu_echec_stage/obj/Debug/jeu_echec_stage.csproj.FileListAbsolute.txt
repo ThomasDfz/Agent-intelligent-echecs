@@ -1,0 +1,31 @@
+C:\Users\Fiolyne.p\AppData\Local\Temporary Projects\jeu_echec_stage\bin\Debug\jeu_echec_stage.exe.config
+D:\Desktop\S4_UQAC\STAGE\jeu_echec_stage\jeu_echec_stage\bin\Debug\jeu_echec_stage.exe.config
+D:\Desktop\S4_UQAC\STAGE\jeu_echec_stage\jeu_echec_stage\bin\Debug\jeu_echec_stage.exe
+D:\Desktop\S4_UQAC\STAGE\jeu_echec_stage\jeu_echec_stage\bin\Debug\jeu_echec_stage.pdb
+D:\Desktop\S4_UQAC\STAGE\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.csprojResolveAssemblyReference.cache
+D:\Desktop\S4_UQAC\STAGE\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.Form1.resources
+D:\Desktop\S4_UQAC\STAGE\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.Properties.Resources.resources
+D:\Desktop\S4_UQAC\STAGE\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.csproj.GenerateResource.Cache
+D:\Desktop\S4_UQAC\STAGE\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.exe
+D:\Desktop\S4_UQAC\STAGE\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.pdb
+D:\Logiciels développés\[2017-06-30] - Échec\jeu_echec_stage\jeu_echec_stage\bin\Debug\jeu_echec_stage.exe.config
+D:\Logiciels développés\[2017-06-30] - Échec\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.exe
+D:\Logiciels développés\[2017-06-30] - Échec\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.pdb
+D:\Logiciels développés\[2017-06-30] - Échecs\jeu_echec_stage\jeu_echec_stage\bin\Debug\jeu_echec_stage.exe.config
+D:\Logiciels développés\[2017-06-30] - Échecs\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.exe
+D:\Logiciels développés\[2017-06-30] - Échecs\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.pdb
+D:\Logiciels développés\[2017-06-30] - Échecs\jeu_echec_stage\jeu_echec_stage\bin\Debug\jeu_echec_stage.exe
+D:\Logiciels développés\[2017-06-30] - Échecs\jeu_echec_stage\jeu_echec_stage\bin\Debug\jeu_echec_stage.pdb
+D:\Logiciels développés\[2017-06-30] - Échecs\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.csprojResolveAssemblyReference.cache
+D:\Logiciels développés\[2017-06-30] - Échecs\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.Form1.resources
+D:\Logiciels développés\[2017-06-30] - Échecs\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.Properties.Resources.resources
+D:\Logiciels développés\[2017-06-30] - Échecs\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.csproj.GenerateResource.Cache
+C:\Users\Rayth\OneDrive\Documents\UQAC\Intelligence artificielle\Plateforme de base\jeu_echec_stage\jeu_echec_stage\bin\Debug\jeu_echec_stage.exe.config
+C:\Users\Rayth\OneDrive\Documents\UQAC\Intelligence artificielle\Plateforme de base\jeu_echec_stage\jeu_echec_stage\bin\Debug\jeu_echec_stage.exe
+C:\Users\Rayth\OneDrive\Documents\UQAC\Intelligence artificielle\Plateforme de base\jeu_echec_stage\jeu_echec_stage\bin\Debug\jeu_echec_stage.pdb
+C:\Users\Rayth\OneDrive\Documents\UQAC\Intelligence artificielle\Plateforme de base\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.csprojResolveAssemblyReference.cache
+C:\Users\Rayth\OneDrive\Documents\UQAC\Intelligence artificielle\Plateforme de base\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.Form1.resources
+C:\Users\Rayth\OneDrive\Documents\UQAC\Intelligence artificielle\Plateforme de base\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.Properties.Resources.resources
+C:\Users\Rayth\OneDrive\Documents\UQAC\Intelligence artificielle\Plateforme de base\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.csproj.GenerateResource.Cache
+C:\Users\Rayth\OneDrive\Documents\UQAC\Intelligence artificielle\Plateforme de base\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.exe
+C:\Users\Rayth\OneDrive\Documents\UQAC\Intelligence artificielle\Plateforme de base\jeu_echec_stage\jeu_echec_stage\obj\Debug\jeu_echec_stage.pdb
