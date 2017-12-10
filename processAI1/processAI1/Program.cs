@@ -11,10 +11,47 @@ namespace processAI1
 {
     class Program
     {
-       static void Main(string[] args)
+        static void Main(string[] args)
         {
             try
             {
+                /* tests */
+                string coor = "d4";
+
+                string[] mesPieces = { coor };
+                int[] myPiecesT = { 5 };
+
+                string[] advPieces = { "e2", "g2", "f4" };
+                int[] advPiecesT = { 1, 5, 1 };
+
+                List<string> voidTiles = new List<string>();
+
+
+                char[] tab = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+
+                for (int i = 1; i <= 8; i++)
+                    foreach (char c in tab)
+                        voidTiles.Add(c + i.ToString());
+
+                BoardOpt BO = new BoardOpt(mesPieces, advPieces, voidTiles.ToArray(),
+                                    myPiecesT, advPiecesT);
+
+                ulong[] positions = { };
+                int[] values = { };
+
+                Random rnd = new Random();
+                BO.GetPossiblePositions(BO.ConvertPositionStringToLong(coor), out positions, out values);
+
+                int it = 0;
+                Console.WriteLine("Moving from " + coor + " to :");
+                if (positions.Length > 0)
+                    foreach (var p in positions)
+                        Console.WriteLine(BO.ConvertPositionLongToString(p) + " : " + values[it++]);
+                else
+                    Console.WriteLine("this piece cannot move");
+
+                /* end test*/
+
                 bool stop = false;
                 int[] tabVal = new int[64];
                 String value;
@@ -32,12 +69,12 @@ namespace processAI1
                 {
                     using (var mmf = MemoryMappedFile.OpenExisting("plateau"))
                     {
-                        using(var mmf2 = MemoryMappedFile.OpenExisting("repAI1"))
+                        using (var mmf2 = MemoryMappedFile.OpenExisting("repAI1"))
                         {
                             Mutex mutexStartAI1 = Mutex.OpenExisting("mutexStartAI1");
                             Mutex mutexAI1 = Mutex.OpenExisting("mutexAI1");
                             mutexAI1.WaitOne();
-                            
+
                             mutexStartAI1.WaitOne();
 
                             using (var accessor = mmf.CreateViewAccessor())
@@ -62,26 +99,61 @@ namespace processAI1
                                 /******************************************************************************************************/
                                 /***************************************** ECRIRE LE CODE DE L'IA *************************************/
                                 /******************************************************************************************************/
-
+                                /*
                                 List<String> mesPieces = new List<String>();
+                                List<int> myPiecesT = new List<int>();
                                 for (int i = 0; i < tabVal.Length; i++)
                                 {
-                                    if (tabVal[i] > 0) mesPieces.Add(tabCoord[i]);
+                                    if (tabVal[i] > 0)
+                                    {
+                                        mesPieces.Add(tabCoord[i]);
+                                        myPiecesT.Add(tabVal[i]);
+                                    }
                                 }
-                                List<String> reste = new List<String>();
+                                List<String> advPieces = new List<String>();
+                                List<int> advPiecesT = new List<int>();
                                 for (int i = 0; i < tabVal.Length; i++)
                                 {
-                                    if (tabVal[i] <= 0) reste.Add(tabCoord[i]);
+                                    if (tabVal[i] < 0)
+                                    {
+                                        advPieces.Add(tabCoord[i]);
+                                        advPiecesT.Add(tabVal[i]);
+                                    }
                                 }
+                                List<String> voidTiles = new List<String>();
+                                for (int i = 0; i < tabVal.Length; i++)
+                                {
+                                    if (tabVal[i] == 0) voidTiles.Add(tabCoord[i]);
+                                }
+                                BoardOpt BO = new BoardOpt(mesPieces.ToArray(), advPieces.ToArray(), voidTiles.ToArray(),
+                                    myPiecesT.ToArray(), advPiecesT.ToArray());
+
+                                ulong[] positions = { };
+                                float[] values = { };
+
+
 
                                 Random rnd = new Random();
-                                coord[0] = mesPieces[rnd.Next(mesPieces.Count)];
-                                //coord[0] = "b7";
-                                //coord[1] = "b8";
-                                coord[1] = tabCoord[rnd.Next(reste.Count)];
-                                //coord[2] = "P";
 
-                                
+                                //while(positions.Length <= 0)
+                                {
+                                    //coord[0] = mesPieces[rnd.Next(mesPieces.Count)];
+                                    coord[0] = "b1";
+                                    BO.GetPossiblePositions(BO.ConvertPositionStringToLong(coord[0]), out positions, out values);
+
+                                    Console.WriteLine("Moving from " + coord[0] + " to :");
+                                    if (positions.Length > 0)
+                                        foreach (var p in positions)
+                                            Console.WriteLine(BO.ConvertPositionLongToString(p));
+                                    else
+                                        Console.WriteLine("this piece cannot move");
+
+                                }
+                                //coord[1] = "b3";
+                                coord[1] = BO.ConvertPositionLongToString(positions[rnd.Next(positions.Length)]);
+                                coord[2] = "P";
+
+                                */
                                 /********************************************************************************************************/
                                 /********************************************************************************************************/
                                 /********************************************************************************************************/
