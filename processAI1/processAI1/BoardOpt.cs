@@ -468,7 +468,6 @@ namespace processAI1
             myPiecesValue = myPiecesT;
             advPiecesValue = advPiecesT;
 
-            //Console.WriteLine();
             foreach (ulong pos in this.voidTiles)
             {
                 //Console.Write(ConvertPositionLongToString(pos) + " -");

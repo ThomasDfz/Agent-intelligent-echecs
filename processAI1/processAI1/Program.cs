@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace processAI1
             try
             {
                 /* tests */
-                string coor = "d4";
+              /*  string coor = "d4";
 
                 string[] mesPieces = { coor };
                 int[] myPiecesT = { 5 };
@@ -49,7 +50,7 @@ namespace processAI1
                         Console.WriteLine(BO.ConvertPositionLongToString(p) + " : " + values[it++]);
                 else
                     Console.WriteLine("this piece cannot move");
-
+*/
                 /* end test*/
 
                 bool stop = false;
@@ -99,7 +100,7 @@ namespace processAI1
                                 /******************************************************************************************************/
                                 /***************************************** ECRIRE LE CODE DE L'IA *************************************/
                                 /******************************************************************************************************/
-                                /*
+                                
                                 List<String> mesPieces = new List<String>();
                                 List<int> myPiecesT = new List<int>();
                                 for (int i = 0; i < tabVal.Length; i++)
@@ -129,18 +130,13 @@ namespace processAI1
                                     myPiecesT.ToArray(), advPiecesT.ToArray());
 
                                 ulong[] positions = { };
-                                float[] values = { };
+                                int[] values = { };
 
-
-
-                                Random rnd = new Random();
-
-                                //while(positions.Length <= 0)
+                                /*Random rnd = new Random();
+                                while(positions.Length <= 0)
                                 {
-                                    //coord[0] = mesPieces[rnd.Next(mesPieces.Count)];
-                                    coord[0] = "b1";
+                                    coord[0] = mesPieces[rnd.Next(mesPieces.Count)];
                                     BO.GetPossiblePositions(BO.ConvertPositionStringToLong(coord[0]), out positions, out values);
-
                                     Console.WriteLine("Moving from " + coord[0] + " to :");
                                     if (positions.Length > 0)
                                         foreach (var p in positions)
@@ -149,11 +145,26 @@ namespace processAI1
                                         Console.WriteLine("this piece cannot move");
 
                                 }
-                                //coord[1] = "b3";
-                                coord[1] = BO.ConvertPositionLongToString(positions[rnd.Next(positions.Length)]);
-                                coord[2] = "P";
+                                coord[1] = BO.ConvertPositionLongToString(positions[rnd.Next(positions.Length)]);*/
 
-                                */
+                                int maxEarns = Int32.MinValue + 1;
+                                foreach (var piece in mesPieces)
+                                {
+                                    BO.GetPossiblePositions(BO.ConvertPositionStringToLong(piece), out positions, out values);
+                                    for (var i = 0; i < positions.Length; i++)
+                                    {
+                                        if (values[i] > maxEarns)
+                                        {
+                                            maxEarns = values[i];
+                                            coord[0] = piece;
+                                            coord[1] = BO.ConvertPositionLongToString(positions[i]);
+                                            if (coord[1][1] == '8') coord[2] = "D";
+                                        }
+                                    }
+                                }
+                                Console.WriteLine("Best move :");
+                                Console.WriteLine(coord[0] + " ->" + coord[1] + " de gain " + maxEarns);
+                                
                                 /********************************************************************************************************/
                                 /********************************************************************************************************/
                                 /********************************************************************************************************/
