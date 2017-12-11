@@ -16,10 +16,13 @@ namespace processAI1
             try
             {
                 /* tests */
-                string coor = "d4";
+                ulong voidTile = 0;
+                /*
+                
+                string coor = "a7";
 
                 string[] mesPieces = { coor };
-                int[] myPiecesT = { 5 };
+                int[] myPiecesT = { 1 };
 
                 string[] advPieces = { "e2", "g2", "f4" };
                 int[] advPiecesT = { 1, 5, 1 };
@@ -49,7 +52,7 @@ namespace processAI1
                         Console.WriteLine(BO.ConvertPositionLongToString(p) + " : " + values[it++]);
                 else
                     Console.WriteLine("this piece cannot move");
-
+                */
                 /* end test*/
 
                 bool stop = false;
@@ -99,7 +102,7 @@ namespace processAI1
                                 /******************************************************************************************************/
                                 /***************************************** ECRIRE LE CODE DE L'IA *************************************/
                                 /******************************************************************************************************/
-                                /*
+                                
                                 List<String> mesPieces = new List<String>();
                                 List<int> myPiecesT = new List<int>();
                                 for (int i = 0; i < tabVal.Length; i++)
@@ -126,19 +129,25 @@ namespace processAI1
                                     if (tabVal[i] == 0) voidTiles.Add(tabCoord[i]);
                                 }
                                 BoardOpt BO = new BoardOpt(mesPieces.ToArray(), advPieces.ToArray(), voidTiles.ToArray(),
-                                    myPiecesT.ToArray(), advPiecesT.ToArray());
+                                    myPiecesT.ToArray(), advPiecesT.ToArray(), true);
 
+
+                                if (voidTile == BO.boardFreeTile)
+                                {
+                                    Console.WriteLine("last play not done");
+                                }
+                                else
+                                    voidTile = BO.boardFreeTile;
                                 ulong[] positions = { };
-                                float[] values = { };
-
+                                int[] values = { };
 
 
                                 Random rnd = new Random();
 
-                                //while(positions.Length <= 0)
+                                while(positions.Length <= 0)
                                 {
-                                    //coord[0] = mesPieces[rnd.Next(mesPieces.Count)];
-                                    coord[0] = "b1";
+                                    coord[0] = mesPieces[rnd.Next(mesPieces.Count)];
+                                    //coord[0] = "b1";
                                     BO.GetPossiblePositions(BO.ConvertPositionStringToLong(coord[0]), out positions, out values);
 
                                     Console.WriteLine("Moving from " + coord[0] + " to :");
@@ -147,13 +156,12 @@ namespace processAI1
                                             Console.WriteLine(BO.ConvertPositionLongToString(p));
                                     else
                                         Console.WriteLine("this piece cannot move");
-
                                 }
                                 //coord[1] = "b3";
                                 coord[1] = BO.ConvertPositionLongToString(positions[rnd.Next(positions.Length)]);
                                 coord[2] = "P";
 
-                                */
+                                
                                 /********************************************************************************************************/
                                 /********************************************************************************************************/
                                 /********************************************************************************************************/

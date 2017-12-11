@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace processAI1
+namespace processAI2
 {
     class BoardOpt
     {
@@ -67,10 +67,10 @@ namespace processAI1
         private ulong newPosition(ulong start, int col, int line)
         {
             ulong newPos = 0;
-            if (col != 0)
+            if(col != 0)
             {
                 int rs = getColumn(start) + col;
-                if (rs <= 0 || rs > 8)
+                if ( rs <= 0 || rs > 8)
                     return 0; // out of board
             }
             if (line != 0)
@@ -451,7 +451,7 @@ namespace processAI1
         public BoardOpt(string[] whitePieces, string[] blackPieces, string[] voidTiles, int[] whitePiecesT, int[] blackPiecesT, bool wp = true)
         {
             whitePlayerer = wp;
-
+            
             foreach (string s in voidTiles)
             {
                 ulong pos = ConvertPositionStringToLong(s);

@@ -7,6 +7,7 @@ using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Threading;
 
+
 namespace processAI2
 {
     class Program
@@ -15,6 +16,12 @@ namespace processAI2
         {
             try
             {
+                /* test */
+                ulong voidTile = 0;
+
+
+                /* end test */
+
                 bool stop = false;
                 int[] tabVal = new int[64];
                 String value;
@@ -27,7 +34,7 @@ namespace processAI2
                                                    "a3","b3","c3","d3","e3","f3","g3","h3",
                                                    "a2","b2","c2","d2","e2","f2","g2","h2",
                                                    "a1","b1","c1","d1","e1","f1","g1","h1" };
-
+                
                 while (!stop)
                 {
                     using (var mmf = MemoryMappedFile.OpenExisting("plateau"))
@@ -62,24 +69,65 @@ namespace processAI2
                                 /***************************************** ECRIRE LE CODE DE L'IA *************************************/
                                 /******************************************************************************************************/
 
-                                List<String> mesPieces = new List<String>();
-                                for (int i = 0; i < tabVal.Length; i++)
-                                {
-                                    if (tabVal[i] < 0) mesPieces.Add(tabCoord[i]);
-                                }
 
-                                List<String> reste = new List<String>();
+                                List<String> mesPieces = new List<String>();
+                                List<int> myPiecesT = new List<int>();
                                 for (int i = 0; i < tabVal.Length; i++)
                                 {
-                                    if (tabVal[i] <= 0) reste.Add(tabCoord[i]);
+                                    if (tabVal[i] < 0)
+                                    {
+                                        mesPieces.Add(tabCoord[i]);
+                                        myPiecesT.Add(tabVal[i]);
+                                    }
                                 }
+                                List<String> advPieces = new List<String>();
+                                List<int> advPiecesT = new List<int>();
+                                for (int i = 0; i < tabVal.Length; i++)
+                                {
+                                    if (tabVal[i] > 0)
+                                    {
+                                        advPieces.Add(tabCoord[i]);
+                                        advPiecesT.Add(tabVal[i]);
+                                    }
+                                }
+                                List<String> voidTiles = new List<String>();
+                                for (int i = 0; i < tabVal.Length; i++)
+                                {
+                                    if (tabVal[i] == 0) voidTiles.Add(tabCoord[i]);
+                                }
+                                BoardOpt BO = new BoardOpt(advPieces.ToArray(), mesPieces.ToArray(), voidTiles.ToArray(),
+                                    advPiecesT.ToArray(), myPiecesT.ToArray(), false);
+
+                                if(voidTile == BO.boardFreeTile)
+                                {
+                                    Console.WriteLine("last play not done");
+                                }
+                                else
+                                    voidTile = BO.boardFreeTile;
+
+                                ulong[] positions = { };
+                                int[] values = { };
+
 
                                 Random rnd = new Random();
-                                coord[0] = mesPieces[rnd.Next(mesPieces.Count)];
-                                //coord[0] = "petit roque";
-                                coord[1] = tabCoord[rnd.Next(reste.Count)];
-                                //coord[1] = "";
-                                //coord[2] = "";
+
+                                while (positions.Length <= 0)
+                                {
+                                    coord[0] = mesPieces[rnd.Next(mesPieces.Count)];
+                                    //coord[0] = "b1";
+                                    BO.GetPossiblePositions(BO.ConvertPositionStringToLong(coord[0]), out positions, out values);
+
+                                    Console.WriteLine("Moving from " + coord[0] + " to :");
+                                    if (positions.Length > 0)
+                                        foreach (var p in positions)
+                                            Console.WriteLine(BO.ConvertPositionLongToString(p));
+                                    else
+                                        Console.WriteLine("this piece cannot move");
+                                }
+                                //coord[1] = "b3";
+                                coord[1] = BO.ConvertPositionLongToString(positions[rnd.Next(positions.Length)]);
+                                coord[2] = "P";
+
 
                                 /********************************************************************************************************/
                                 /********************************************************************************************************/
