@@ -29,7 +29,7 @@ namespace processAI1
                     value = 880;
                     break;
                 case 6:
-                    value = 9000;
+                    value = 1100;
                     break;
             }
             return value;
