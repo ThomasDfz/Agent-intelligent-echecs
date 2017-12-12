@@ -8,18 +8,9 @@ namespace processAI2
 {
     class BoardOpt
     {
-        public bool whitePlayerer { get; set; }
-
         // pieces positions are stored on 64 bits (8 x 8) corresponding 
         // to cases of the board game
-        private ulong[] voidTiles;
-
-        public ulong boardFreeTile = 0;
-        private ulong boardBlackPieces = 0;
-        private ulong boardWhitePieces = 0;
-
-        private Dictionary<ulong, int> mapValues = new Dictionary<ulong, int>(); // todo replace by getVal(mapType[i])
-        private Dictionary<ulong, int> mapTypes = new Dictionary<ulong, int>();
+        public BoardStruct board; // todo : set private after tests
 
         private int typePieceToValue(int type)
         { // return value of a piece, if returned vlaue > 8.8F : chec
@@ -67,10 +58,10 @@ namespace processAI2
         private ulong newPosition(ulong start, int col, int line)
         {
             ulong newPos = 0;
-            if(col != 0)
+            if (col != 0)
             {
                 int rs = getColumn(start) + col;
-                if ( rs <= 0 || rs > 8)
+                if (rs <= 0 || rs > 8)
                     return 0; // out of board
             }
             if (line != 0)
@@ -93,17 +84,17 @@ namespace processAI2
             return newPos;
         }
         /* possible solutions methods */
-        private void GetPossiblePositionPion(ulong position, out ulong[] sol, out int[] val, bool whitePlayer = true)
+        private void GetPossiblePositionPion(ulong position, out ulong[] sol, out int[] val)
         {  // ?? implements change piece ??
             List<ulong> solutions = new List<ulong>();
             List<int> values = new List<int>();
 
             List<ulong> newPositions = new List<ulong>();
 
-            if (whitePlayer)
+            if (board.WhiteTrait)
             {
                 ulong pos = newPosition(position, 0, 1);
-                if ((pos & boardFreeTile) != 0)
+                if ((pos & (0xFFFFFFFFFFFFFFFF ^ (board.WhitePieces | board.BlackPieces))) != 0)
                 {
                     solutions.Add(pos);
                     values.Add(0);
@@ -114,31 +105,31 @@ namespace processAI2
                 for (int i = 0; i < playsCol.Length; i++)
                 {
                     newPositions.Add(newPosition(position, playsCol[i], playsLine[i]));
-                    if ((newPositions[i] & boardBlackPieces) != 0)
+                    if ((newPositions[i] & board.BlackPieces) != 0)
                     {
                         solutions.Add(newPositions[i]);
-                        values.Add(mapValues[newPositions[i]]);
+                        values.Add(typePieceToValue(board.TypesMap[newPositions[i]]));
                     }
                 }
             }
             else
             {
                 ulong pos = newPosition(position, 0, -1);
-                if ((pos & boardFreeTile) != 0)
+                if ((pos & (0xFFFFFFFFFFFFFFFF ^ (board.WhitePieces | board.BlackPieces))) != 0)
                 {
                     solutions.Add(pos);
                     values.Add(0);
                 }
 
-                int[] playsCol = { -1, -1 };
-                int[] playsLine = { 1, -1 };
+                int[] playsCol = { -1, 1 };
+                int[] playsLine = { -1, -1 };
                 for (int i = 0; i < playsCol.Length; i++)
                 {
                     newPositions.Add(newPosition(position, playsCol[i], playsLine[i]));
-                    if ((newPositions[i] & boardWhitePieces) != 0)
+                    if ((newPositions[i] & board.WhitePieces) != 0)
                     {
                         solutions.Add(newPositions[i]);
-                        values.Add(mapValues[newPositions[i]]);
+                        values.Add(typePieceToValue(board.TypesMap[newPositions[i]]));
                     }
                 }
             }
@@ -147,7 +138,7 @@ namespace processAI2
             val = values.ToArray();
         }
 
-        private void GetPossiblePositionCavalier(ulong position, out ulong[] sol, out int[] val, bool whitePlayer = true)
+        private void GetPossiblePositionCavalier(ulong position, out ulong[] sol, out int[] val)
         {
             List<ulong> solutions = new List<ulong>();
             List<int> values = new List<int>();
@@ -155,37 +146,20 @@ namespace processAI2
             int[] playsCol = { -2, -2, -1, -1, 1, 1, 2, 2 };
             int[] playsLine = { -1, 1, -2, 2, -2, 2, -1, 1 };
 
-            List<ulong> newPositions = new List<ulong>();
-
             for (int i = 0; i < playsCol.Length; i++)
             {
-                newPositions.Add(newPosition(position, playsCol[i], playsLine[i]));
-                //Console.WriteLine(ConvertPositionLongToString((newPosition(position, playsCol[i], playsLine[i]))));
-            }
+                ulong pos = newPosition(position, playsCol[i], playsLine[i]);
 
-            foreach (ulong pos in newPositions)
-            {
-                if ((pos & boardFreeTile) != 0)
+                if ((pos & (0xFFFFFFFFFFFFFFFF ^ (board.WhitePieces | board.BlackPieces))) != 0)
                 {
                     solutions.Add(pos);
                     values.Add(0);
+                    continue;
                 }
-
-                if (whitePlayer)
+                if ((board.WhiteTrait && (pos & board.BlackPieces) != 0) || (!board.WhiteTrait && (pos & board.WhitePieces) != 0))
                 {
-                    if ((pos & boardBlackPieces) != 0)
-                    {
-                        solutions.Add(pos);
-                        values.Add(mapValues[pos]);
-                    }
-                }
-                else
-                {
-                    if ((pos & boardWhitePieces) != 0)
-                    {
-                        solutions.Add(pos);
-                        values.Add(mapValues[pos]);
-                    }
+                    solutions.Add(pos);
+                    values.Add(typePieceToValue(board.TypesMap[pos]));
                 }
             }
 
@@ -193,7 +167,7 @@ namespace processAI2
             val = values.ToArray();
         }
 
-        private void GetPossiblePositionKing(ulong position, out ulong[] sol, out int[] val, bool whitePlayer = true)
+        private void GetPossiblePositionKing(ulong position, out ulong[] sol, out int[] val)
         {  // ?? implement roques ?? 
             List<ulong> solutions = new List<ulong>();
             List<int> values = new List<int>();
@@ -201,44 +175,26 @@ namespace processAI2
             int[] playsCol = { -1, -1, -1, 0, 0, 1, 1, 1 };
             int[] playsLine = { -1, 0, 1, -1, 1, -1, 0, 1 };
 
-            List<ulong> newPositions = new List<ulong>();
-
             for (int i = 0; i < playsCol.Length; i++)
             {
-                newPositions.Add(newPosition(position, playsCol[i], playsLine[i]));
-                //Console.WriteLine(ConvertPositionLongToString((newPosition(position, playsCol[i], playsLine[i]))));
-            }
-
-            foreach (ulong pos in newPositions)
-            {
-                if ((pos & boardFreeTile) != 0)
+                ulong pos = newPosition(position, playsCol[i], playsLine[i]);
+                if ((pos & (0xFFFFFFFFFFFFFFFF ^ (board.WhitePieces | board.BlackPieces))) != 0)
                 {
                     solutions.Add(pos);
                     values.Add(0);
+                    continue;
                 }
-
-                if (whitePlayer)
+                if ((board.WhiteTrait && (pos & board.BlackPieces) != 0) || (!board.WhiteTrait && (pos & board.WhitePieces) != 0))
                 {
-                    if ((pos & boardBlackPieces) != 0)
-                    {
-                        solutions.Add(pos);
-                        values.Add(mapValues[pos]);
-                    }
-                }
-                else
-                {
-                    if ((pos & boardWhitePieces) != 0)
-                    {
-                        solutions.Add(pos);
-                        values.Add(mapValues[pos]);
-                    }
+                    solutions.Add(pos);
+                    values.Add(typePieceToValue(board.TypesMap[pos]));
                 }
             }
 
             sol = solutions.ToArray();
             val = values.ToArray();
         }
-        private void GetPossiblePositionTour(ulong position, out ulong[] sol, out int[] val, bool whitePlayer = true)
+        private void GetPossiblePositionTour(ulong position, out ulong[] sol, out int[] val)
         {
             List<ulong> solutions = new List<ulong>();
             List<int> values = new List<int>();
@@ -264,17 +220,17 @@ namespace processAI2
                     ulong np = newPosition(position, i * left, i * up);
                     if (np != 0) // still in board
                     {
-                        if ((np & boardFreeTile) != 0) // in a free tile
+                        if ((np & (0xFFFFFFFFFFFFFFFF ^ (board.WhitePieces | board.BlackPieces))) != 0) // in a free tile
                         {
                             solutions.Add(np);
                             values.Add(0);
                         }
                         else
                         {
-                            if ((whitePlayer && (np & boardBlackPieces) != 0) || (!whitePlayer && (np & boardWhitePieces) != 0)) // on an adverse tile
+                            if ((board.WhiteTrait && (np & board.BlackPieces) != 0) || (!board.WhiteTrait && (np & board.WhitePieces) != 0)) // on an adverse tile
                             {
                                 solutions.Add(np);
-                                values.Add(mapValues[np]);
+                                values.Add(typePieceToValue(board.TypesMap[np]));
                             }
                             break; // a piece block the way
                         }
@@ -286,7 +242,7 @@ namespace processAI2
             sol = solutions.ToArray();
             val = values.ToArray();
         }
-        private void GetPossiblePositionFou(ulong position, out ulong[] sol, out int[] val, bool whitePlayer = true)
+        private void GetPossiblePositionFou(ulong position, out ulong[] sol, out int[] val)
         {
             List<ulong> solutions = new List<ulong>();
             List<int> values = new List<int>();
@@ -311,17 +267,17 @@ namespace processAI2
                     ulong np = newPosition(position, i * left, i * up);
                     if (np != 0) // still in board
                     {
-                        if ((np & boardFreeTile) != 0) // in a free tile
+                        if ((np & (0xFFFFFFFFFFFFFFFF ^ (board.WhitePieces | board.BlackPieces))) != 0) // in a free tile
                         {
                             solutions.Add(np);
                             values.Add(0);
                         }
                         else
                         {
-                            if ((whitePlayer && (np & boardBlackPieces) != 0) || (!whitePlayer && (np & boardWhitePieces) != 0)) // on an adverse tile
+                            if ((board.WhiteTrait && (np & board.BlackPieces) != 0) || (!board.WhiteTrait && (np & board.WhitePieces) != 0)) // on an adverse tile
                             {
                                 solutions.Add(np);
-                                values.Add(mapValues[np]);
+                                values.Add(typePieceToValue(board.TypesMap[np]));
                             }
                             break; // a piece block the way
                         }
@@ -334,7 +290,7 @@ namespace processAI2
             sol = solutions.ToArray();
             val = values.ToArray();
         }
-        private void GetPossiblePositionQueen(ulong position, out ulong[] sol, out int[] val, bool whitePlayer = true)
+        private void GetPossiblePositionQueen(ulong position, out ulong[] sol, out int[] val)
         {
             List<ulong> solutions = new List<ulong>();
             List<int> values = new List<int>();
@@ -375,17 +331,17 @@ namespace processAI2
                     ulong np = newPosition(position, i * left, i * up);
                     if (np != 0) // still in board
                     {
-                        if ((np & boardFreeTile) != 0) // in a free tile
+                        if ((np & (0xFFFFFFFFFFFFFFFF ^ (board.WhitePieces | board.BlackPieces))) != 0) // in a free tile
                         {
                             solutions.Add(np);
                             values.Add(0);
                         }
                         else
                         {
-                            if ((whitePlayer && (np & boardBlackPieces) != 0) || (!whitePlayer && (np & boardWhitePieces) != 0)) // on an adverse tile
+                            if ((board.WhiteTrait && (np & board.BlackPieces) != 0) || (!board.WhiteTrait && (np & board.WhitePieces) != 0)) // on an adverse tile
                             {
                                 solutions.Add(np);
-                                values.Add(mapValues[np]);
+                                values.Add(typePieceToValue(board.TypesMap[np]));
                             }
                             break; // a piece block the way
                         }
@@ -399,46 +355,40 @@ namespace processAI2
         }
         public void GetPossiblePositions(ulong posPiece, out ulong[] solutions, out int[] values)
         {
-            //Console.WriteLine("  ######  ");
-            //Console.WriteLine("Get piece : " + ConvertPositionLongToString(posPiece));
+            int typePiece = board.TypesMap[posPiece];
 
-            int typePiece = mapTypes[posPiece];
-
-            //Console.WriteLine("Determine type : " + typePiece);
-
-            bool whitePlayer = (typePiece > 0);
+            board.WhiteTrait = (typePiece > 0);
             typePiece = (typePiece < 0) ? -typePiece : typePiece;
 
             switch (typePiece)
             {
                 case 1: // pion 
-                    GetPossiblePositionPion(posPiece, out solutions, out values, whitePlayer);
+                    GetPossiblePositionPion(posPiece, out solutions, out values);
                     break;
                 case 4: // fou
-                    GetPossiblePositionFou(posPiece, out solutions, out values, whitePlayer);
+                    GetPossiblePositionFou(posPiece, out solutions, out values);
                     break;
                 case 5: // queen
-                    GetPossiblePositionQueen(posPiece, out solutions, out values, whitePlayer);
+                    GetPossiblePositionQueen(posPiece, out solutions, out values);
                     break;
                 case 6: // king
-                    GetPossiblePositionKing(posPiece, out solutions, out values, whitePlayer);
+                    GetPossiblePositionKing(posPiece, out solutions, out values);
                     break;
                 case 10: // pion passant not discriminated
-                    GetPossiblePositionPion(posPiece, out solutions, out values, whitePlayer);
+                    GetPossiblePositionPion(posPiece, out solutions, out values);
                     break;
                 case 21: // tour
-                    GetPossiblePositionTour(posPiece, out solutions, out values, whitePlayer);
+                    GetPossiblePositionTour(posPiece, out solutions, out values);
                     break;
                 case 22: // tour
-                    GetPossiblePositionTour(posPiece, out solutions, out values, whitePlayer);
+                    GetPossiblePositionTour(posPiece, out solutions, out values);
                     break;
                 case 31: // cavalier
-                    GetPossiblePositionCavalier(posPiece, out solutions, out values, whitePlayer);
+                    GetPossiblePositionCavalier(posPiece, out solutions, out values);
                     break;
                 case 32: // cavalier
-                    GetPossiblePositionCavalier(posPiece, out solutions, out values, whitePlayer);
+                    GetPossiblePositionCavalier(posPiece, out solutions, out values);
                     break;
-
 
                 default:
                     solutions = null;
@@ -447,40 +397,58 @@ namespace processAI2
             }
             Console.WriteLine("  ######  ");
         }
-        /* constructor */
+
+        public BoardStruct GetNewBoard(ulong start, ulong arrive)
+        {
+            BoardStruct bo = this.board;
+            if (board.WhiteTrait)
+            {
+                bo.BlackPieces = bo.BlackPieces ^ arrive;
+                bo.WhitePieces = (bo.WhitePieces | arrive) ^ start;
+            }
+            else
+            {
+                bo.WhitePieces = bo.WhitePieces ^ arrive;
+                bo.BlackPieces = (bo.BlackPieces | arrive) ^ start;
+            }
+            bo.WhiteTrait = !bo.WhiteTrait;
+            return bo;
+        }
+
+        /* constructors */
+        public BoardOpt(BoardStruct bo)
+        {
+            this.board = bo;
+            bo.WhitePieces = 0;
+            bo.BlackPieces = 0;
+        }
         public BoardOpt(string[] whitePieces, string[] blackPieces, string[] voidTiles, int[] whitePiecesT, int[] blackPiecesT, bool wp = true)
         {
-            whitePlayerer = wp;
-            
+            board.WhiteTrait = wp;
+
+            board.TypesMap = new Dictionary<ulong, int>();
             foreach (string s in voidTiles)
-            {
-                ulong pos = ConvertPositionStringToLong(s);
-                //Console.Write(ConvertPositionLongToString(pos) + " -");
-                boardFreeTile = boardFreeTile | pos;
-                mapValues[pos] = 0;
-                mapTypes[pos] = 0;
-            }
+                board.TypesMap[ConvertPositionStringToLong(s)] = 0;
+
             int n = 0;
             foreach (string s in whitePieces)
             {
                 ulong pos = ConvertPositionStringToLong(s);
-                this.boardWhitePieces = this.boardWhitePieces | pos;
-                mapTypes[pos] = whitePiecesT[n];
-                mapValues[pos] = typePieceToValue(whitePiecesT[n]);
+                this.board.WhitePieces = this.board.WhitePieces | pos;
+                board.TypesMap[pos] = whitePiecesT[n];
                 n++;
             }
             n = 0;
             foreach (string s in blackPieces)
             {
                 ulong pos = ConvertPositionStringToLong(s);
-                this.boardBlackPieces = this.boardBlackPieces | pos;
-                mapTypes[pos] = blackPiecesT[n];
-                mapValues[pos] = typePieceToValue(blackPiecesT[n]);
+                this.board.BlackPieces = this.board.BlackPieces | pos;
+                board.TypesMap[pos] = blackPiecesT[n];
                 n++;
             }
-            if (mapValues.Count != 64)
+            if (board.TypesMap.Count != 64)
             {
-                Console.WriteLine("didn't receive all the data from board, only " + mapValues.Count + "/64 elements got.");
+                Console.WriteLine("didn't receive all the data from board, only " + board.TypesMap.Count + "/64 elements got.");
             }
         }
 
@@ -496,11 +464,11 @@ namespace processAI2
             if (p == 0)
                 Console.WriteLine("null position");
             int i = 1;
-            while (p >> i != 0 && (p >> i) < p)
+            while (p >> (i * 8) != 0 && (p >> (i * 8)) < p)
             {
                 i++;
             }
-            return ((i - 1) / 8) + 1;
+            return i;
         }
         private int getLine(ulong p)
         {
@@ -513,12 +481,9 @@ namespace processAI2
                 i++;
 
             return i;
-
         }
         public ulong ConvertPositionStringToLong(string s)
         {
-            //Console.WriteLine("convert : " + s);
-
             ulong piece = 1;
             short line = (short)s[0];
             line -= (short)'a';
@@ -528,13 +493,10 @@ namespace processAI2
             piece = piece << 8 * line;
             piece = piece << row;
 
-            //Console.WriteLine("Into : " + Convert.ToString((long)piece, 2));
-            //Console.WriteLine("  ######  ");
             return piece;
         }
         public string ConvertPositionLongToString(ulong l)
         {
-            //Console.WriteLine("Convert : " + Convert.ToString((long)l, 2));
             if (l == 0)
                 return "a1";
 
@@ -548,10 +510,33 @@ namespace processAI2
             piece += (char)('a' + i / 8);
             piece += i % 8 + 1;
 
-            //Console.WriteLine("Into : " + piece);
-            //Console.WriteLine("  ######  ");
-
             return piece;
         }
+        private ulong[] getPiecesInBoard(ulong b)
+        { // careful, may have bugs
+            List<ulong> listP = new List<ulong>();
+            ulong p = 1;
+            while (p <= b && (p << 1) >= p)
+            {
+                p = p << 1;
+                if ((b & p) != 0)
+                    listP.Add(p);
+            }
+            return listP.ToArray();
+        }
+        public String ToString()
+        {
+            String str = "Trait : ";
+            str += board.WhiteTrait ? "white" : "black";
+            str += "\n White Pieces : \n";
+            foreach (ulong pos in getPiecesInBoard(board.WhitePieces))
+                str += $" {board.TypesMap[pos]} in {ConvertPositionLongToString(pos)} -";
+            str += "\n Black pieces : \n";
+            foreach (ulong pos in getPiecesInBoard(board.BlackPieces))
+                str += $" {board.TypesMap[pos]} in {ConvertPositionLongToString(pos)} -";
+
+            return str;
+        }
+
     }
 }

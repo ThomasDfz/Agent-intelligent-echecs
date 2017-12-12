@@ -103,6 +103,7 @@ namespace processAI1
                                 /***************************************** ECRIRE LE CODE DE L'IA *************************************/
                                 /******************************************************************************************************/
                                 
+                                /* get free tiles and pieces */
                                 List<String> mesPieces = new List<String>();
                                 List<int> myPiecesT = new List<int>();
                                 for (int i = 0; i < tabVal.Length; i++)
@@ -131,23 +132,21 @@ namespace processAI1
                                 BoardOpt BO = new BoardOpt(mesPieces.ToArray(), advPieces.ToArray(), voidTiles.ToArray(),
                                     myPiecesT.ToArray(), advPiecesT.ToArray(), true);
 
-
-                                if (voidTile == BO.boardFreeTile)
+                                /* verify if the last play has been done */
+                                if (voidTile == (0xFFFFFFFFFFFFFFFF ^ (BO.board.WhitePieces | BO.board.BlackPieces)))
                                 {
                                     Console.WriteLine("last play not done");
                                 }
                                 else
-                                    voidTile = BO.boardFreeTile;
+                                    voidTile = (0xFFFFFFFFFFFFFFFF ^ (BO.board.WhitePieces | BO.board.BlackPieces));
                                 ulong[] positions = { };
                                 int[] values = { };
 
-
+                                /* take a random legal play */
                                 Random rnd = new Random();
-
                                 while(positions.Length <= 0)
                                 {
                                     coord[0] = mesPieces[rnd.Next(mesPieces.Count)];
-                                    //coord[0] = "b1";
                                     BO.GetPossiblePositions(BO.ConvertPositionStringToLong(coord[0]), out positions, out values);
 
                                     Console.WriteLine("Moving from " + coord[0] + " to :");
@@ -157,11 +156,19 @@ namespace processAI1
                                     else
                                         Console.WriteLine("this piece cannot move");
                                 }
-                                //coord[1] = "b3";
-                                coord[1] = BO.ConvertPositionLongToString(positions[rnd.Next(positions.Length)]);
-                                coord[2] = "P";
-
                                 
+                                coord[1] = BO.ConvertPositionLongToString(positions[rnd.Next(positions.Length)]);
+                                coord[2] = "D"; // always take a Queen if a pion cross the board
+
+                                // create a new board with the last play
+                                BoardStruct bo = BO.GetNewBoard(BO.ConvertPositionStringToLong(coord[0]), BO.ConvertPositionStringToLong(coord[1]));
+                                // create a new board object
+                                BoardOpt BO2 = new BoardOpt(bo);
+
+
+                                Console.WriteLine(BO.ToString());
+                                Console.WriteLine(BO2.ToString());
+
                                 /********************************************************************************************************/
                                 /********************************************************************************************************/
                                 /********************************************************************************************************/

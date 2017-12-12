@@ -98,12 +98,12 @@ namespace processAI2
                                 BoardOpt BO = new BoardOpt(advPieces.ToArray(), mesPieces.ToArray(), voidTiles.ToArray(),
                                     advPiecesT.ToArray(), myPiecesT.ToArray(), false);
 
-                                if(voidTile == BO.boardFreeTile)
+                                if(voidTile == (0xFFFFFFFFFFFFFFFF ^ (BO.board.WhitePieces | BO.board.BlackPieces)))
                                 {
                                     Console.WriteLine("last play not done");
                                 }
                                 else
-                                    voidTile = BO.boardFreeTile;
+                                    voidTile = (0xFFFFFFFFFFFFFFFF ^ (BO.board.WhitePieces | BO.board.BlackPieces));
 
                                 ulong[] positions = { };
                                 int[] values = { };
@@ -126,7 +126,7 @@ namespace processAI2
                                 }
                                 //coord[1] = "b3";
                                 coord[1] = BO.ConvertPositionLongToString(positions[rnd.Next(positions.Length)]);
-                                coord[2] = "P";
+                                coord[2] = "D";
 
 
                                 /********************************************************************************************************/
