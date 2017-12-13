@@ -1,0 +1,18 @@
+:authors: DEFOSSEZ Thomas FRANCOIS Edouard
+
+= Présentation agent joueur d'échecs
+
+== Introduction
+:toc:
+
+== Représentation du plateau de jeu
+
+
+
+== Choix du meilleur coups
+
+== Fonctionnalités manquantes du jeu
+
+=== prise en passant
+=== echec et mat
+=== modélisation despièces
