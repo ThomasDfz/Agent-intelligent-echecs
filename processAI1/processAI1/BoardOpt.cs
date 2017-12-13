@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace processAI1
 {
-    class BoardOpt
+    public class BoardOpt
     {
         // pieces positions are stored on 64 bits (8 x 8) corresponding 
         // to cases of the board game

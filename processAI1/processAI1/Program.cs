@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -103,6 +104,8 @@ namespace processAI1
                                 /***************************************** ECRIRE LE CODE DE L'IA *************************************/
                                 /******************************************************************************************************/
                                 
+                                Stopwatch sw = Stopwatch.StartNew();
+                                
                                 /* get free tiles and pieces */
                                 List<String> mesPieces = new List<String>();
                                 List<int> myPiecesT = new List<int>();
@@ -142,8 +145,37 @@ namespace processAI1
                                 ulong[] positions = { };
                                 int[] values = { };
 
+                                /*Select best move according to minimax algorithm*/
+                                Node actualChessboardBeliefs = new Node(mesPieces, BO);
+                                MiniMax miniMax = new MiniMax();
+                                int depth = 2; //3 is too long
+                                Tuple<String, String> intentions = miniMax.ComputeIntentions(actualChessboardBeliefs, depth, 0);
+                                coord[0] = intentions.Item1;
+                                coord[1] = intentions.Item2;
+                                
+                                /*int maxEarns = Int32.MinValue + 1;
+                                foreach (var piece in mesPieces)
+                                {
+                                    BO.GetPossiblePositions(BO.ConvertPositionStringToLong(piece), out positions, out values);
+                                    int index = 0;
+                                    foreach (var movement in positions)
+                                    {
+                                        /*if (Math.Abs(values[index]) > maxEarns)
+                                        {
+                                            coord[0] = piece;
+                                            coord[1] = BO.ConvertPositionLongToString(movement);
+                                            maxEarns = Math.Abs(values[index]);
+                                        }*/
+                                        /*BoardStruct bs = BO.GetNewBoard(BO.ConvertPositionStringToLong(piece), movement);
+                                        BoardOpt BO2 = new BoardOpt(bs);
+                                        index++;
+                                    }
+                                }*/
+                                
+                                
                                 /* take a random legal play */
-                                Random rnd = new Random();
+ 
+                                /*Random rnd = new Random();
                                 while(positions.Length <= 0)
                                 {
                                     coord[0] = mesPieces[rnd.Next(mesPieces.Count)];
@@ -158,16 +190,16 @@ namespace processAI1
                                 }
                                 
                                 coord[1] = BO.ConvertPositionLongToString(positions[rnd.Next(positions.Length)]);
-                                coord[2] = "D"; // always take a Queen if a pion cross the board
-
+                                
+                                */
                                 // create a new board with the last play
-                                BoardStruct bo = BO.GetNewBoard(BO.ConvertPositionStringToLong(coord[0]), BO.ConvertPositionStringToLong(coord[1]));
+                                //BoardStruct bo = BO.GetNewBoard(BO.ConvertPositionStringToLong(coord[0]), BO.ConvertPositionStringToLong(coord[1]));
                                 // create a new board object
-                                BoardOpt BO2 = new BoardOpt(bo);
-
-
-                                Console.WriteLine(BO.ToString());
-                                Console.WriteLine(BO2.ToString());
+                                //BoardOpt BO2 = new BoardOpt(bo);
+                                //Console.WriteLine(BO.ToString());
+                                //Console.WriteLine(BO2.ToString());
+                                coord[2] = "D"; // always take a Queen if a pion cross the board
+                                Console.WriteLine("TIME " + sw.ElapsedMilliseconds);
 
                                 /********************************************************************************************************/
                                 /********************************************************************************************************/
