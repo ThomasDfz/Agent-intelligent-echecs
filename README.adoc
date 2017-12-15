@@ -45,11 +45,11 @@ ulong de valeur `0x00 00 00 00 00 00 00 02`. Ici en
 hexadécimal, on peut remarque la corelation une colonne = un octet. +
 On utilise donc un parseur dès que l'environnement nous donne les pièces de l'échequier
 pour transformer les strings en ulong.
-+
+
 **Mais pourquoi se contenter d'une seule position dans ulong possédant 64 bits ?** +
 Ainsi, on utilise deux ulong pour séparer les deux équipes : un tableau de positions
 des pièces blanches et un tableau de positions des pièces noires. +
-Ex : `0x00 01 03 00 00 00 00 00` Aille, cette équipe n'as plus que 3 pièces ! +
+Ex : `0x00 01 03 00 00 00 00 00` Aille, cette équipe n'as plus que 3 pièces !
 
 **Mais comment trouver les cases vides ou trouver si une case est occupée par un ennemi ?
 On doit itérer à travers 2 ulong pour trouver la position.** +
@@ -62,7 +62,6 @@ obtenir les cases vides, il nous suffit juste d'utiliser le `NOT` sur la valeure
 Enfin, pour savoir si une case est libre, on utilise le `ET` logique avec la position et les
 cases libres pour obtenir un résultat. Ex : `(0x00 .. 01 & 0x10 .. 03) == 0` nous renverra
 `false`, la case visée est libre.
-+
 
 === Les coups possibles
 ==== Les pions
