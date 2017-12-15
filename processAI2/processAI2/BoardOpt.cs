@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace processAI2
 {
-    class BoardOpt
+    public class BoardOpt
     {
         // pieces positions are stored on 64 bits (8 x 8) corresponding 
         // to cases of the board game
@@ -36,7 +36,7 @@ namespace processAI2
                 case 5: // dame
                     return 880 * sign;
                 case 6: // roi
-                    return 1100 * sign;
+                    return 9000 * sign;
 
                 default:
                     return 0;
@@ -395,7 +395,7 @@ namespace processAI2
                     values = null;
                     break;
             }
-            Console.WriteLine("  ######  ");
+           // Console.WriteLine("  ######  ");
         }
 
         public BoardStruct GetNewBoard(ulong start, ulong arrive)

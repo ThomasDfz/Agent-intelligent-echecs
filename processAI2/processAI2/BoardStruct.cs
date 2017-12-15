@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace processAI2
 {
-    struct BoardStruct
+    public struct BoardStruct
     {
         public bool WhiteTrait;
         public ulong WhitePieces;

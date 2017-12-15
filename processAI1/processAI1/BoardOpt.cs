@@ -36,7 +36,7 @@ namespace processAI1
                 case 5: // dame
                     return 880 * sign;
                 case 6: // roi
-                    return 1100 * sign;
+                    return 9000 * sign;
 
                 default:
                     return 0;
@@ -279,7 +279,7 @@ namespace processAI1
                                 solutions.Add(np);
                                 values.Add(typePieceToValue(board.TypesMap[np]));
                             }
-                            break; // a piece block the way
+                            break; // a piece blocks the way
                         }
                     }
                     else
@@ -395,7 +395,7 @@ namespace processAI1
                     values = null;
                     break;
             }
-            Console.WriteLine("  ######  ");
+            //Console.WriteLine("  ######  ");
         }
 
         public BoardStruct GetNewBoard(ulong start, ulong arrive)

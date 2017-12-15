@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -69,8 +70,111 @@ namespace processAI2
                                 /***************************************** ECRIRE LE CODE DE L'IA *************************************/
                                 /******************************************************************************************************/
 
-
+                                
+                                Stopwatch sw = Stopwatch.StartNew();
+                                
+                                /* get free tiles and pieces */
                                 List<String> mesPieces = new List<String>();
+                                List<int> myPiecesT = new List<int>();
+                                for (int i = 0; i < tabVal.Length; i++)
+                                {
+                                    if (tabVal[i] < 0)
+                                    {
+                                        mesPieces.Add(tabCoord[i]);
+                                        myPiecesT.Add(tabVal[i]);
+                                    }
+                                }
+                                List<String> advPieces = new List<String>();
+                                List<int> advPiecesT = new List<int>();
+                                for (int i = 0; i < tabVal.Length; i++)
+                                {
+                                    if (tabVal[i] > 0)
+                                    {
+                                        advPieces.Add(tabCoord[i]);
+                                        advPiecesT.Add(tabVal[i]);
+                                    }
+                                }
+                                List<String> voidTiles = new List<String>();
+                                for (int i = 0; i < tabVal.Length; i++)
+                                {
+                                    if (tabVal[i] == 0) voidTiles.Add(tabCoord[i]);
+                                }
+                                BoardOpt BO = new BoardOpt(mesPieces.ToArray(), advPieces.ToArray(), voidTiles.ToArray(),
+                                    myPiecesT.ToArray(), advPiecesT.ToArray(), false);
+
+                                /* verify if the last play has been done */
+                                if (voidTile == (0xFFFFFFFFFFFFFFFF ^ (BO.board.WhitePieces | BO.board.BlackPieces)))
+                                {
+                                    Console.WriteLine("last play not done");
+                                }
+                                else
+                                    voidTile = (0xFFFFFFFFFFFFFFFF ^ (BO.board.WhitePieces | BO.board.BlackPieces));
+                                ulong[] positions = { };
+                                int[] values = { };
+                                
+                                /*Is our king in danger ?*/
+                               /* if (isCheck(mesPieces, myPiecesT, advPieces, advPiecesT))
+                                {
+                                    
+                                }*/
+
+                                /*Select best move according to minimax algorithm*/
+                                Node actualChessboardBeliefs = new Node(mesPieces, BO);
+                                MiniMax miniMax = new MiniMax();
+                                int depth = 1; //3 is sometimes too long
+                                Tuple<String, String> intentions = miniMax.ComputeIntentions(actualChessboardBeliefs, depth, 0);
+                                coord[0] = intentions.Item1;
+                                coord[1] = intentions.Item2;
+                                
+                                /*int maxEarns = Int32.MinValue + 1;
+                                foreach (var piece in mesPieces)
+                                {
+                                    BO.GetPossiblePositions(BO.ConvertPositionStringToLong(piece), out positions, out values);
+                                    int index = 0;
+                                    foreach (var movement in positions)
+                                    {
+                                        /*if (Math.Abs(values[index]) > maxEarns)
+                                        {
+                                            coord[0] = piece;
+                                            coord[1] = BO.ConvertPositionLongToString(movement);
+                                            maxEarns = Math.Abs(values[index]);
+                                        }*/
+                                        /*BoardStruct bs = BO.GetNewBoard(BO.ConvertPositionStringToLong(piece), movement);
+                                        BoardOpt BO2 = new BoardOpt(bs);
+                                        index++;
+                                    }
+                                }*/
+                                
+                                
+                                /* take a random legal play */
+ 
+                                /*Random rnd = new Random();
+                                while(positions.Length <= 0)
+                                {
+                                    coord[0] = mesPieces[rnd.Next(mesPieces.Count)];
+                                    BO.GetPossiblePositions(BO.ConvertPositionStringToLong(coord[0]), out positions, out values);
+
+                                    Console.WriteLine("Moving from " + coord[0] + " to :");
+                                    if (positions.Length > 0)
+                                        foreach (var p in positions)
+                                            Console.WriteLine(BO.ConvertPositionLongToString(p));
+                                    else
+                                        Console.WriteLine("this piece cannot move");
+                                }
+                                
+                                coord[1] = BO.ConvertPositionLongToString(positions[rnd.Next(positions.Length)]);
+                                
+                                */
+                                // create a new board with the last play
+                                //BoardStruct bo = BO.GetNewBoard(BO.ConvertPositionStringToLong(coord[0]), BO.ConvertPositionStringToLong(coord[1]));
+                                // create a new board object
+                                //BoardOpt BO2 = new BoardOpt(bo);
+                                //Console.WriteLine(BO.ToString());
+                                //Console.WriteLine(BO2.ToString());
+                                coord[2] = "D"; // always take a Queen if a pion cross the board
+                                Console.WriteLine("TIME " + sw.ElapsedMilliseconds);
+
+                                /*List<String> mesPieces = new List<String>();
                                 List<int> myPiecesT = new List<int>();
                                 for (int i = 0; i < tabVal.Length; i++)
                                 {
@@ -126,7 +230,7 @@ namespace processAI2
                                 }
                                 //coord[1] = "b3";
                                 coord[1] = BO.ConvertPositionLongToString(positions[rnd.Next(positions.Length)]);
-                                coord[2] = "D";
+                                coord[2] = "D";*/
 
 
                                 /********************************************************************************************************/

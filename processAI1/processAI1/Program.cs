@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Security.Cryptography;
 using System.Threading;
 
 namespace processAI1
@@ -144,11 +145,17 @@ namespace processAI1
                                     voidTile = (0xFFFFFFFFFFFFFFFF ^ (BO.board.WhitePieces | BO.board.BlackPieces));
                                 ulong[] positions = { };
                                 int[] values = { };
+                                
+                                /*Is our king in danger ?*/
+                                /*if (isCheck(mesPieces, myPiecesT, advPieces, advPiecesT))
+                                {
+                                    
+                                }*/
 
                                 /*Select best move according to minimax algorithm*/
                                 Node actualChessboardBeliefs = new Node(mesPieces, BO);
                                 MiniMax miniMax = new MiniMax();
-                                int depth = 2; //3 is too long
+                                int depth = 5; //3 is sometimes too long
                                 Tuple<String, String> intentions = miniMax.ComputeIntentions(actualChessboardBeliefs, depth, 0);
                                 coord[0] = intentions.Item1;
                                 coord[1] = intentions.Item2;
@@ -228,6 +235,173 @@ namespace processAI1
                 Console.WriteLine("Memory-mapped file does not exist. Run Process A first.");
                 Console.ReadLine();
             }
+        }
+
+        public static bool isCheck(List<String> myPieces, List<int> myPiecesT, List<String> advPieces, List<int> advPiecesT)
+        {
+            bool isKingCheck = false;
+            int trait = myPiecesT[0] > 0 ? -1 : 1;
+            String kingPos = myPieces[myPiecesT.IndexOf(6)];
+            int kingCol = (int)kingPos[0];
+            int kingRow = (int)Char.GetNumericValue(kingPos[1]);
+            for (int col = kingCol - 1; col >= 97; col--)
+            {
+                String actualPos = (char) col + kingRow.ToString();
+                if (advPieces.Contains(actualPos))
+                {
+                    int p = advPiecesT[advPieces.IndexOf(actualPos)];
+                    if (p == trait*5 || p == trait*21 || p == trait*22)
+                    {
+                        isKingCheck = true;
+                    }
+                }
+                if (myPieces.Contains(actualPos))
+                {
+                    break;
+                }
+            }
+            for (int col = kingCol + 1; col <= 104; col++)
+            {
+                String actualPos = (char) col + kingRow.ToString();
+                if (advPieces.Contains(actualPos))
+                {
+                    int p = advPiecesT[advPieces.IndexOf(actualPos)];
+                    if (p == trait*5 || p == trait*21 || p == trait*22)
+                    {
+                        isKingCheck = true;
+                    }
+                }
+                if (myPieces.Contains(actualPos))
+                {
+                    break;
+                }
+            }
+            for (int row = kingRow - 1; row >= 1; row--)
+            {
+                String actualPos = (char) kingCol + row.ToString();
+                if (advPieces.Contains(actualPos))
+                {
+                    int p = advPiecesT[advPieces.IndexOf(actualPos)];
+                    if (p == trait*5 || p == trait*21 || p == trait*22)
+                    {
+                        isKingCheck = true;
+                    }
+                }
+                if (myPieces.Contains(actualPos))
+                {
+                    break;
+                }
+            }
+            for (int row = kingRow + 1; row <= 8; row++)
+            {
+                String actualPos = (char) kingCol + row.ToString();
+                if (advPieces.Contains(actualPos))
+                {
+                    int p = advPiecesT[advPieces.IndexOf(actualPos)];
+                    if (p == trait*5 || p == trait*21 || p == trait*22)
+                    {
+                        isKingCheck = true;
+                    }
+                }
+                if (myPieces.Contains(actualPos))
+                {
+                    break;
+                }
+            }
+            bool cont = true;
+            int index = 1;
+            while (cont)
+            {
+                if (kingRow++ > 8 || kingCol-- < 97) cont = false;
+                else
+                {
+                    String actualPos = (char) (kingCol - index) + (kingRow + index).ToString();
+                    if (advPieces.Contains(actualPos))
+                    {
+                        int p = advPiecesT[advPieces.IndexOf(actualPos)];
+                        if (p == trait*5 || p == trait*4)
+                        {
+                            isKingCheck = true;
+                        }
+                    }
+                    if (myPieces.Contains(actualPos))
+                    {
+                        cont = false;
+                    }
+                    index++;
+                }
+            }
+            cont = true;
+            index = 1;
+            while (cont)
+            {
+                if (kingRow++ > 8 || kingCol++ > 104) cont = false;
+                else
+                {
+                    String actualPos = (char) (kingCol + index) + (kingRow + index).ToString();
+                    if (advPieces.Contains(actualPos))
+                    {
+                        int p = advPiecesT[advPieces.IndexOf(actualPos)];
+                        if (p == trait*5 || p == trait*4)
+                        {
+                            isKingCheck = true;
+                        }
+                    }
+                    if (myPieces.Contains(actualPos))
+                    {
+                        cont = false;
+                    }
+                    index++;
+                }
+            }
+            cont = true;
+            index = 1;
+            while (cont)
+            {
+                if (kingRow-- < 1 || kingCol-- < 97) cont = false;
+                else
+                {
+                    String actualPos = (char) (kingCol - index) + (kingRow - index).ToString();
+                    if (advPieces.Contains(actualPos))
+                    {
+                        int p = advPiecesT[advPieces.IndexOf(actualPos)];
+                        if (p == trait*5 || p == trait*4)
+                        {
+                            isKingCheck = true;
+                        }
+                    }
+                    if (myPieces.Contains(actualPos))
+                    {
+                        cont = false;
+                    }
+                    index++;
+                }
+            }
+            cont = true;
+            index = 1;
+            while (cont)
+            {
+                if (kingRow-- < 1 || kingCol++ > 104) cont = false;
+                else
+                {
+                    String actualPos = (char) (kingCol - index) + (kingRow + index).ToString();
+                    if (advPieces.Contains(actualPos))
+                    {
+                        int p = advPiecesT[advPieces.IndexOf(actualPos)];
+                        if (p == trait*5 || p == trait*4)
+                        {
+                            isKingCheck = true;
+                        }
+                    }
+                    if (myPieces.Contains(actualPos))
+                    {
+                        cont = false;
+                    }
+                    index++;
+                }
+            }
+            Console.WriteLine("echec  ? : " + isKingCheck);
+            return isKingCheck;
         }
     }
 }

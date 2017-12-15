@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace processAI1
+namespace processAI2
 {
     public class PieceValue
     {

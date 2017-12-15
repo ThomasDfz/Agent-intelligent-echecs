@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace processAI1
+namespace processAI2
 {
     public class MiniMax
     {
-        bool MaxPlayer = true;
-
         public Tuple<String, String> ComputeIntentions(Node node, int depth, int earns)
         {
             ulong[] positions = { };
@@ -31,8 +29,10 @@ namespace processAI1
             {
                 node.BO.GetPossiblePositions(node.BO.ConvertPositionStringToLong(piece), out positions, out values);
                 int index = 0;
+                Console.WriteLine("Ma pièce en : " + piece + " peut aller en : ");
                 foreach (var movement in positions)
                 {
+                    Console.WriteLine(node.BO.ConvertPositionLongToString(movement));
                     if (depth == 1)
                     {
                         if (Math.Abs(values[index]) > maxEarns)
