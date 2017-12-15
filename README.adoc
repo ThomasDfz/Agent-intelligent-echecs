@@ -199,6 +199,13 @@ d'IA.
 détecter les pats (pas de coups possibles, 
 x fois le même coup ou n coups sans prendre
 de pièce).
+** Utiliser un enum au lieu de int codés
+en dur pour les types de pièces (plus facile 
+à lire et a coder)
+** Prendre automatiquement la prise en passant,
+ne pas avoir besoin pour l'ia de dire au 
+controller de prendre la pièce, il le fait
+automatiquement.
 ** Faire perdre automatiquement en cas de
 coup non autorisé (et non réinitialiser le
 temps pour faire un coup).
