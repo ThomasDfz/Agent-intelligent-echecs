@@ -9,10 +9,48 @@
 
 
 
-== Choix du meilleur coups
+== Choix du meilleur coup
+
+Afin de permettre à notre agent de prioriser ses choix de coups, nous avons 
+attribué à chaque pièce une valeur. Nous avons utilisé les valeurs proposées par
+Hans Berliner (ancien champion du monde d'échecs par correspondance) qui sont les 
+suivantes (avec un facteur 100 pour travailler avec des entiers) :
+
+* Pion : 100
+* Cavalier : 320
+* Fou : 333
+* Tour : 510
+* Dame : 880
+
+Nous avons grâce à ça pu réaliser un algorithme de type minimax afin de choisir 
+le meilleur coup en prenant en compte les mouvement que l'adversaire pourrait faire
+et ce selon une certaine profondeur. 
+
+On retrouve dans MiniMax.cs la fonction ComputeIntentions prenant en compte une profondeur, 
+et un état actuel. Si la profondeur est de 1, on va juste parcourir tous les mouvements
+possibles de toutes les pièces possibles, et réaliser celui qui nous offre le plus de gains.
+
+Si la profondeur est supérieure, alors on appelle notre fonction RecursiveMinMax.
+A chaque itération de cette fonction, on va coup à coup récupérer le meilleur coup réalisable
+par l'adversaire puis le meilleur coup réalisable par notre agent. De cette manière,
+lorsqu'on va remonter dans la pile des appels de la fonction RecursiveMinMax, on aura
+le coup étant le meilleur compromis entre nos possibles futurs gains et ceux de l'adversaire.
+
 
 == Fonctionnalités manquantes du jeu
 
 === prise en passant
-=== echec et mat
+=== echec et echec et mat
+
+L'idée de départ était d'attribuer un gain très fort au roi, de cette manière notre 
+agent n'aurait jamais joué de coup lui assurant de se trouver en position d'échec.
+Cependant parfois il est inévitable de se trouver en position d'échec. Dans ces cas, 
+notre agent ne trouve parfois pas le coup lui permettant de sortir de cette position,
+même si nous ne sommes pas en situation d'échec et mat. Nous avons commencé à développer 
+une fonction spécialement pour ce cas, mais ce ne fut pas fructueux.
+
+De même pour mettre en échec et mat l'agent ennemi, une fois qu'il se retrouve
+en situation d'infériorité, il est difficile pour notre agent d'obtenir une situation
+d'échec et mat.
+
 === modélisation despièces
