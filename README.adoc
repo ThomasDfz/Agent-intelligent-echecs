@@ -178,3 +178,37 @@ une fonction spécialement pour ce cas, mais ce ne fut pas fructueux.
 De même pour mettre en échec et mat l'agent ennemi, une fois qu'il se retrouve
 en situation d'infériorité, il est difficile pour notre agent d'obtenir une situation
 d'échec et mat.
+
+== Idees d'amelioration pour le controller
+Le contrôleur `jeu_echecs_stage` peut recevoir
+quelques améliorations en vu d'un meilleur debuggage,
+lecture du jeu, appel des fonctions :
+[circle]
+* Affichage de la partie :
+** Lorsqu'un déplacement est demandé par une
+des IA, mettre en surbrillance la case de départ
+et d'arrivée, ce qui ameliorerai la lecture du jeu (surtout
+lors des echecs/pats.
+** mettre les coups faits lors de la partie
+dans un tableau pour pouvoir revoir le fil de la 
+partie.
+** Pouvoir choisir le temps pour chaque reflexion 
+d'IA.
+* Concernant l'intelligence de jeu :
+** ameliorer la détection d'échec et mat,
+détecter les pats (pas de coups possibles, 
+x fois le même coup ou n coups sans prendre
+de pièce).
+** Faire perdre automatiquement en cas de
+coup non autorisé (et non réinitialiser le
+temps pour faire un coup).
+** Utiliser directement des ulong ou système équivalent
+à la places des tableaux de string pour les positions.
+** Avoir une API sans affichage : pouvoir lancer ou
+relancer le jeu sans passer par la
+fenetre de jeu (et stocker les donnees des 
+parties jouées). Cela permettrait de pouvoir
+créer des scripts pour tester les IA (et
+rassembler des informations pour par exemple les
+réseaux neuronnaux) ou pour faire jouer
+automatiquement les pools.
