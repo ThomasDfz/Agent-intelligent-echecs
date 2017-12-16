@@ -155,7 +155,7 @@ namespace processAI1
                                 /*Select best move according to minimax algorithm*/
                                 Node actualChessboardBeliefs = new Node(mesPieces, BO);
                                 MiniMax miniMax = new MiniMax();
-                                int depth = 5; //3 is sometimes too long
+                                int depth = 3; //3 is sometimes too long
                                 Tuple<String, String> intentions = miniMax.ComputeIntentions(actualChessboardBeliefs, depth, 0);
                                 coord[0] = intentions.Item1;
                                 coord[1] = intentions.Item2;

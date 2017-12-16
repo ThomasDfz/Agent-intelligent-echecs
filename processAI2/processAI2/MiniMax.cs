@@ -29,10 +29,8 @@ namespace processAI2
             {
                 node.BO.GetPossiblePositions(node.BO.ConvertPositionStringToLong(piece), out positions, out values);
                 int index = 0;
-                Console.WriteLine("Ma pièce en : " + piece + " peut aller en : ");
                 foreach (var movement in positions)
                 {
-                    Console.WriteLine(node.BO.ConvertPositionLongToString(movement));
                     if (depth == 1)
                     {
                         if (Math.Abs(values[index]) > maxEarns)

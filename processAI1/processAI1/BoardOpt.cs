@@ -36,7 +36,7 @@ namespace processAI1
                 case 5: // dame
                     return 880 * sign;
                 case 6: // roi
-                    return 9000 * sign;
+                    return 1100 * sign;
 
                 default:
                     return 0;

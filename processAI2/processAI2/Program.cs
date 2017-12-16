@@ -99,8 +99,8 @@ namespace processAI2
                                 {
                                     if (tabVal[i] == 0) voidTiles.Add(tabCoord[i]);
                                 }
-                                BoardOpt BO = new BoardOpt(mesPieces.ToArray(), advPieces.ToArray(), voidTiles.ToArray(),
-                                    myPiecesT.ToArray(), advPiecesT.ToArray(), false);
+                                BoardOpt BO = new BoardOpt(advPieces.ToArray(), mesPieces.ToArray(), voidTiles.ToArray(),
+                                    advPiecesT.ToArray(), myPiecesT.ToArray(), false);
 
                                 /* verify if the last play has been done */
                                 if (voidTile == (0xFFFFFFFFFFFFFFFF ^ (BO.board.WhitePieces | BO.board.BlackPieces)))
@@ -121,7 +121,7 @@ namespace processAI2
                                 /*Select best move according to minimax algorithm*/
                                 Node actualChessboardBeliefs = new Node(mesPieces, BO);
                                 MiniMax miniMax = new MiniMax();
-                                int depth = 1; //3 is sometimes too long
+                                int depth = 3; 
                                 Tuple<String, String> intentions = miniMax.ComputeIntentions(actualChessboardBeliefs, depth, 0);
                                 coord[0] = intentions.Item1;
                                 coord[1] = intentions.Item2;
