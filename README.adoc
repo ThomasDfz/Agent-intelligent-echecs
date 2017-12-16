@@ -3,16 +3,219 @@
 = Présentation agent joueur d'échecs
 
 == Introduction
+NOTE: Une compréhension des opération binaires est nécessaire à la bonne lecture de ce document.
+
 :toc:
 
 == Représentation du plateau de jeu
+=== Les positions
+De base, les positions des pièces sont données avec des couples de caractères (ex: `a8`).
+Or cette représentation coûte chère en mémoire et en traitement :
+[circle]
+* mémoire : deux caractères (unicide) par positions soit `2 x 32 x 64` bits ou 512 octets stockées dans
+un tableau. Si on doit recréer pour chaque coups possibles la mémoire
+risque de saturer.
+* traitement : convertir une chaîne de caractères en positions n'est pas chose très aisée.
+Par exemple, le fou en A3 peut se déplacer d'une case en haut à droite, soit une colonne de
+plus et une ligne de plus. Quelle est la colonne suivante après le caractère `3` et la ligne
+après le caractère `a` ?
 
+Pour pallier ces problèmes, on stocke les positions dans un long integer non signé (`ulong`). +
+En effet, un `ulong` se représente sur 64 bits correspondant aux 64 cases de l'échéquier.
+On saute 8 bits pour sauter une colonne et 1 bit pour sauter une case. +
+On utilise des `unsigned long` plustôt que des `long` pour éviter des conflits avec
+le bit de signe.
+Ainsi on stocke toutes les cases de l'échequier dans une seule variable. +
+Ex : voici une repésentation du plateau en deux dimension
+[source, "c#"]
+----
+cases de l'échequier        positions dans le ulong
+a8   b8   ...                7   15  ...
+a7   b7   ...                6   14  ...
+a6   b6   ...                5   13  ...
+a5   b5   ...                4   12  ...
+a4   b4   ...                3   11  ...
+a3   b3   ...                2   10  ...
+a2   b2   ...                1   9   ...
+a1   b1   ...                0   8   15
+----
 
+Avec cette représentation, une pièce en a2 aura le
+ulong de valeur `0x00 00 00 00 00 00 00 02`. Ici en
+hexadécimal, on peut remarque la corelation une colonne = un octet. +
+On utilise donc un parseur dès que l'environnement nous donne les pièces de l'échequier
+pour transformer les strings en ulong.
 
-== Choix du meilleur coups
+**Mais pourquoi se contenter d'une seule position dans ulong possédant 64 bits ?** +
+Ainsi, on utilise deux ulong pour séparer les deux équipes : un tableau de positions
+des pièces blanches et un tableau de positions des pièces noires. +
+Ex : `0x00 01 03 00 00 00 00 00` Aille, cette équipe n'as plus que 3 pièces !
+
+**Mais comment trouver les cases vides ou trouver si une case est occupée par un ennemi ?
+On doit itérer à travers 2 ulong pour trouver la position.** +
+Et bien non, c'est là tout l'intérêt de l'utilisation des bits de la variable, ils permettent
+de simplifier les calculs grâces aux opérateurs binaires. +
+Ex : mettons que nous voulons savoir les cases occupées sur le plateau par à la fois les
+noirs et les blanc. Il nous suffit d'utiliser un `OU` binaire sur les variables :
+`0x01 .. 00 01 | 0x00 .. 01 00` nous donnera `0x01 .. 0 01` tadam !. De même pour
+obtenir les cases vides, il nous suffit juste d'utiliser le `NOT` sur la valeure obtenue.
+Enfin, pour savoir si une case est libre, on utilise le `ET` logique avec la position et les
+cases libres pour obtenir un résultat. Ex : `(0x00 .. 01 & 0x10 .. 03) == 0` nous renverra
+`false`, la case visée est libre.
+
+=== Les coups possibles
+==== Les pions
+Les pions ont un déplacement très différent des autres pièces : il ne peut se déplacer
+que vers l'avant si cette case est libre ou en diagonale vers l'avant, s'il y a une
+pièce adverse. De plus la notion de "vers l'avant" change en fonction de la couleur :
+les blancs augmentent le chiffre de la ligne ("a5" -> "a6") alors que les noirs la diminuent.
+Ce qu'il fait que nous devons créer deux règles de déplacement pour chaque couleurs. +
+On avance donc d'une case si celle ci est occupée (Ex : pour les blancs
+`if((caseLibre & position << 1) != 0)`). En revanche cette méthode à un inconvéniant de taille,
+il ne prends pas en compte la notion de colonnes et les lignes, on avance juste d'une ligne et
+si on est déjà à la dernière ligne de la colonne alors on se retrouvera à la 1ere ligne de la
+colonne suivante. Pour éviter ceci, on utilise un fonction qui prends en paramètre la position
+actuelle et la position souhaitée en `x` et `y`. Cette fonction utilise les décalages de bits pour
+déterminer que quelle colonne et ligne nous nous trouvons et si en ajoutant `x` et `y` respectivement
+à la colonne, ligne actuelle on ne change pas de colonne ou de ligne. +
+Ainsi lorsque l'on se retrouve en `a7`, un pion ne pourra vérifier le couple de coordonnées `(1,-1)`
+car il correspond à une sortie de tableau, de plus si un pion (non promu) se trouve en `a8`, il ne
+pourra s'avancer en `b1` si cette case est libre.
+
+==== Le roi et les cavaliers
+Ces pièces on le déplacement le plus simple à modéliser du jeu, elles peuvent se déplacer vers huits cases
+différentes si elles sont libres ou occupée par une pièce d'une autre couleur. Ce déplacement contrairement
+aux pions ne change pas en fonction de la couleur de la pièce choisie. On réutilise la fonction
+décrite précédement pour déterminer les cases accessibles et on vérifie qu'elles sont libres on occupées
+par des pièces adverse. +
+Ex : un cavalier (en `a4`) a les coordonnées possibles suivantes : `(-1, 2), (-2, -1), (1, -2), (2, -1), (-2, 1),
+...` Or la fonction de vérification de nouvelle position ne nous autorisera pas les 4 premiers déplacements.
+On vérifie alors si les cases accessibles ne sont pas occupées par notre couleur et on renvoit les solutions
+possibles.
+
+==== La reine, les fous et les tours
+Ces pièces peuvent se déplacement de 7 cases dans 4 ou 8 directions jusqu'à ce
+qu'une pièce de la même couleur ne bloque leur chemin ou jusqu'à ce qu'une
+pièce adverse ne puisse être prise. +
+Ainsi, on parcours les 7 cases à proximités dans les 4 (ou 8) directions et
+on arrête de parcourir une direction si une pièce alliée est sur le chemin,
+si une pièce adverse est trouvée ou si on change de ligne ou colonne à cause d'un
+dépassement des limites du plateau.
+
+=== Les valeurs
+On vient de voir comment récupérer les coups possibles. Maintenant penchons
+nous sur la valeur à accorder à ces coups. +
+Lorsqu'une pièce change de position, elle renvoit la valeur de la case atteinte.
+Pour une case vide (0), pour un pion (100), etc. (voir la partie sur le choix du meilleur coup)+
+Lorsque l'objet repésentant le plateau est instancier, il créé un `Dictonary<ulong, int>`
+permettant de mapper une position à une valeur. Cela permet lors du déplacement d'une pièce
+d'obtenir rapidement la valeur du coup en sachant la position d'arrivée sans devoir reconvertir
+le `ulong` en `string` ou couple de `int (x, y)`. +
+NOTE: Pour associer des valeurs de coups plus pertinentes, on peut utiliser des masques binaires
+de positions préférées. Tout comme les masque utilisés pour déterminer si une position est sur une case
+vide ou occupée par une pièce adverse, on peut créer des masques de positions préférées : +
+Un cavalier au milieu de l'échequier à plus de valeur qu'une reine dans un coin ou derrière
+une autre pièce.  +
+Ainsi le masque suivant est très bien pour favoriser la position au milieu de l'échequier, le
+bits à 0 donne les cases permettant plus de coups possibles (mais ne prends pas en compte si
+d'autre pièces bloquent) :
+[source, 'c#']
+----
+1   1   1   1   1   1   1   1   1
+1   1   1   1   1   1   1   1   1
+1   1   0   0   0   0   0   1   1
+1   1   0   0   0   0   0   1   1
+1   1   0   0   0   0   0   1   1
+1   1   0   0   0   0   0   1   1
+1   1   1   1   1   1   1   1   1
+1   1   1   1   1   1   1   1   1
+----
+
+=== Utilisation
+Pour récupérer les coups possibles, on a juste à créer un nouvel objet `BoardOpt` qui prends
+en paramètre les pièces blanches et noirs (positions et valeurs) ainsi que le trait en cours.
+Cet objet va parser les tableaux données et créer le plaeau. +
+Ensuite on appel la méthode `GetPossiblePositions()` qui prends en paramètre une position de
+pièce et modifie deux listes données en paramètres : une liste de ulong (coups
+possibles) et une liste de int (valeur de chaque coups de la première liste). Ces deux
+listes sont modifiées en utilisant les règles vues précédemment.
+
+== Choix du meilleur coup
+Afin de permettre à notre agent de prioriser ses choix de coups, nous avons
+attribué à chaque pièce une valeur. Nous avons utilisé les valeurs proposées par
+Hans Berliner (ancien champion du monde d'échecs par correspondance) qui sont les
+suivantes (avec un facteur 100 pour travailler avec des entiers) :
+
+* Pion : 100
+* Cavalier : 320
+* Fou : 333
+* Tour : 510
+* Dame : 880
+
+Nous avons grâce à ça pu réaliser un algorithme de type minimax afin de choisir
+le meilleur coup en prenant en compte les mouvement que l'adversaire pourrait faire
+et ce selon une certaine profondeur.
+
+On retrouve dans MiniMax.cs la fonction ComputeIntentions prenant en compte une profondeur,
+et un état actuel. Si la profondeur est de 1, on va juste parcourir tous les mouvements
+possibles de toutes les pièces possibles, et réaliser celui qui nous offre le plus de gains.
+
+Si la profondeur est supérieure, alors on appelle notre fonction RecursiveMinMax.
+A chaque itération de cette fonction, on va coup à coup récupérer le meilleur coup réalisable
+par l'adversaire puis le meilleur coup réalisable par notre agent. De cette manière,
+lorsqu'on va remonter dans la pile des appels de la fonction RecursiveMinMax, on aura
+le coup étant le meilleur compromis entre nos possibles futurs gains et ceux de l'adversaire.
 
 == Fonctionnalités manquantes du jeu
+=== echec et echec et mat
+L'idée de départ était d'attribuer un gain très fort au roi, de cette manière notre
+agent n'aurait jamais joué de coup lui assurant de se trouver en position d'échec.
+Cependant parfois il est inévitable de se trouver en position d'échec. Dans ces cas,
+notre agent ne trouve parfois pas le coup lui permettant de sortir de cette position,
+même si nous ne sommes pas en situation d'échec et mat. Nous avons commencé à développer
+une fonction spécialement pour ce cas, mais ce ne fut pas fructueux.
 
-=== prise en passant
-=== echec et mat
-=== modélisation despièces
+De même pour mettre en échec et mat l'agent ennemi, une fois qu'il se retrouve
+en situation d'infériorité, il est difficile pour notre agent d'obtenir une situation
+d'échec et mat.
+
+== Idees d'amelioration pour le controller
+Le contrôleur `jeu_echecs_stage` peut recevoir
+quelques améliorations en vu d'un meilleur debuggage,
+lecture du jeu, appel des fonctions :
+[circle]
+* Affichage de la partie :
+** Lorsqu'un déplacement est demandé par une
+des IA, mettre en surbrillance la case de départ
+et d'arrivée, ce qui ameliorerai la lecture du jeu (surtout
+lors des echecs/pats.
+** mettre les coups faits lors de la partie
+dans un tableau pour pouvoir revoir le fil de la 
+partie.
+** Pouvoir choisir le temps pour chaque reflexion 
+d'IA.
+* Concernant l'intelligence de jeu :
+** ameliorer la détection d'échec et mat,
+détecter les pats (pas de coups possibles, 
+x fois le même coup ou n coups sans prendre
+de pièce).
+** Utiliser un enum au lieu de int codés
+en dur pour les types de pièces (plus facile 
+à lire et a coder)
+** Prendre automatiquement la prise en passant,
+ne pas avoir besoin pour l'ia de dire au 
+controller de prendre la pièce, il le fait
+automatiquement.
+** Faire perdre automatiquement en cas de
+coup non autorisé (et non réinitialiser le
+temps pour faire un coup).
+** Utiliser directement des ulong ou système équivalent
+à la places des tableaux de string pour les positions.
+** Avoir une API sans affichage : pouvoir lancer ou
+relancer le jeu sans passer par la
+fenetre de jeu (et stocker les donnees des 
+parties jouées). Cela permettrait de pouvoir
+créer des scripts pour tester les IA (et
+rassembler des informations pour par exemple les
+réseaux neuronnaux) ou pour faire jouer
+automatiquement les pools.
